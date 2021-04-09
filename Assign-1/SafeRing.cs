@@ -37,6 +37,7 @@ namespace Assign_1
                 _hasItems.Reset();
 
             _mutex.ReleaseMutex();
+            Console.WriteLine($"Removed {i}");
             return i;
         }
 
@@ -52,6 +53,7 @@ namespace Assign_1
                 _hasCapacity.Reset();
 
             _mutex.ReleaseMutex();
+            Console.WriteLine($"Inserted {numberToInsert}");
         }
 
         public int Count()
