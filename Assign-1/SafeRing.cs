@@ -9,14 +9,15 @@ namespace Assign_1
 {
     public class SafeRing
     {
-        private int[] _buffer;
+
+        private int _size;
         private int _head;
         private int _tail;
-        private int _capacity;
-        private int _size;
+        private readonly int[] _buffer;
+        private readonly int _capacity;
         private readonly Mutex _mutex = new Mutex();
-        private ManualResetEvent _hasItems = new ManualResetEvent(false);
-        private ManualResetEvent _hasCapacity = new ManualResetEvent(true);
+        private readonly ManualResetEvent _hasItems = new ManualResetEvent(false);
+        private readonly ManualResetEvent _hasCapacity = new ManualResetEvent(true);
 
         public SafeRing(int size)
         {
@@ -24,7 +25,7 @@ namespace Assign_1
             _buffer = new int[size];
         }
 
-        public int Remove()
+        public int Remove(int timeout)
         {
             WaitHandle.WaitAll(new WaitHandle[] {_mutex, _hasItems});
 
@@ -37,11 +38,11 @@ namespace Assign_1
                 _hasItems.Reset();
 
             _mutex.ReleaseMutex();
-            Console.WriteLine($"Removed {i}");
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId}: removed {i}");
             return i;
         }
 
-        public void Insert(int numberToInsert)
+        public void Insert(int numberToInsert, int timeout)
         {
             WaitHandle.WaitAll(new WaitHandle[] {_mutex, _hasCapacity});
             _buffer[_tail] = numberToInsert;
@@ -53,7 +54,7 @@ namespace Assign_1
                 _hasCapacity.Reset();
 
             _mutex.ReleaseMutex();
-            Console.WriteLine($"Inserted {numberToInsert}");
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId}: inserted {numberToInsert}");
         }
 
         public int Count()
